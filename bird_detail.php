@@ -186,7 +186,7 @@ if ($bird['uploaded_by']) {
             </form>
 
             <!-- Chat Button -->
-            <button onclick="location.href='messages.php?user=<?=$bird['uploaded_by']?>';" class="btn" style="width:100%;background:var(--primary);color:white;margin-bottom:16px">💬 Chat Penjual</button>
+            <button onclick="location.href='messages.php?user=<?=htmlspecialchars($bird['uploaded_by'])?>';" class="btn" style="width:100%;background:var(--primary);color:white;margin-bottom:16px">💬 Chat Penjual</button>
             
             <a href="dashboard.php?page=orders" class="btn btn-secondary" style="width:100%;text-align:center">Lihat Pesanan Saya</a>
           </div>

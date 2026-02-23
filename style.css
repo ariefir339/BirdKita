@@ -856,7 +856,7 @@ input:focus, select:focus, textarea:focus {
 .site-footer {
   background: linear-gradient(180deg, var(--primary), var(--primary-dark));
   color: var(--text-light);
-  padding: 40px 20px;
+  padding: 40px 20px; 
   border-top: 4px solid var(--accent);
   text-align: center;
   margin-top: 40px;
@@ -1115,6 +1115,85 @@ input:focus, select:focus, textarea:focus {
   border-radius: 20px;
   cursor: pointer;
   font-weight: 600;
+}
+
+/* ========== FILTER TABS STYLES ========== */
+.filter-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  border: 2px solid var(--accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.filter-tabs::-webkit-scrollbar {
+  height: 6px;
+}
+
+.filter-tabs::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+.filter-tabs::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 10px;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 2px solid var(--accent);
+  background: transparent;
+  color: var(--primary);
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 13px;
+  transition: var(--transition);
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.filter-btn:hover {
+  background: var(--accent);
+  color: var(--text-dark);
+  transform: translateY(-2px);
+}
+
+.filter-btn.active {
+  background: var(--primary);
+  color: var(--text-light);
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(63, 138, 84, 0.3);
+}
+
+.gallery-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.gallery-section {
+  background: linear-gradient(135deg, rgba(63, 138, 84, 0.08), rgba(63, 138, 84, 0.05));
+  padding: 20px;
+  border-radius: var(--border-radius);
+  border: 2px solid rgba(63, 138, 84, 0.2);
+  transition: var(--transition);
+}
+
+.gallery-section h4 {
+  color: var(--primary);
+  font-size: 18px;
+  margin-bottom: 16px;
+  font-weight: 700;
+  text-transform: capitalize;
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 8px;
 }
 
 /* ========== REVIEW/RATING STYLES ========== */

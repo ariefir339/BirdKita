@@ -17,7 +17,7 @@ $errors = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
-    // -------- Approve/Reject Seller Listing --------
+// -------- Approve/Reject Seller Listing --------
     if ($action === 'approve_listing' || $action === 'reject_listing') {
         $listing_id = (int)($_POST['listing_id'] ?? 0);
         if ($listing_id) {
@@ -40,9 +40,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } catch (Exception $e) {}
             
             if ($action === 'approve_listing') {
-                $stmt = $pdo->prepare('UPDATE seller_listings SET status = ?, updated_at = NOW() WHERE id = ?');
-                $stmt->execute(['approved', $listing_id]);
-                $messages[] = 'Listing disetujui dan dipublikasi';
+                // Ambil data listing
+                $stmt = $pdo->prepare('SELECT * FROM seller_listings WHERE id = ?');
+                $stmt->execute([$listing_id]);
+                $listing = $stmt->fetch();
+                
+                if ($listing) {
+                    // Pindahkan ke tabel winners
+                    $pdo->exec("CREATE TABLE IF NOT EXISTS winners (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        bird_name VARCHAR(255),
+                        bird_type VARCHAR(255),
+                        bird_price VARCHAR(100),
+                        image_path VARCHAR(255),
+                        bird_rank VARCHAR(50),
+                        uploaded_by INT,
+                        created_at DATETIME
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+                    
+                    $stmt = $pdo->prepare('INSERT INTO winners (bird_name, bird_type, bird_price, image_path, bird_rank, uploaded_by, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())');
+                    $stmt->execute([
+                        $listing['bird_name'],
+                        $listing['bird_type'],
+                        $listing['bird_price'],
+                        $listing['image_path'],
+                        $listing['bird_rank'],
+                        $_SESSION['user']['id']
+                    ]);
+                    
+                    // Update status listing
+                    $stmt = $pdo->prepare('UPDATE seller_listings SET status = ?, updated_at = NOW() WHERE id = ?');
+                    $stmt->execute(['approved', $listing_id]);
+                    
+                    $messages[] = 'Listing disetujui dan dipublikasi ke galeri utama';
+                }
             } else {
                 $reason = trim($_POST['rejection_reason'] ?? '');
                 $stmt = $pdo->prepare('UPDATE seller_listings SET status = ?, rejection_reason = ?, updated_at = NOW() WHERE id = ?');

@@ -95,11 +95,13 @@ if ($other_user_id) {
   <title><?= $other_user_id ? 'Chat dengan ' . htmlspecialchars($other_user['username'] ?? '') : 'Chat' ?> - BirdKita</title>
   <link rel="stylesheet" href="style.css">
   <style>
+    /* WhatsApp Style Chat */
     .chat-view {
       display: grid;
-      grid-template-columns: 300px 1fr;
-      height: 600px;
+      grid-template-columns: 320px 1fr;
+      height: 700px;
       gap: 16px;
+      background: #f0f2f5;
     }
     
     @media (max-width: 768px) {
@@ -109,8 +111,9 @@ if ($other_user_id) {
       }
     }
     
+    /* Sidebar - Conversations List */
     .chat-sidebar {
-      background: white;
+      background: #ffffff;
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
@@ -119,10 +122,24 @@ if ($other_user_id) {
     }
     
     .chat-sidebar-header {
-      background: var(--primary);
+      background: #128c7e;
       color: white;
       padding: 16px;
       font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    .chat-sidebar-header .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #4caf50;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.3);
     }
     
     .conversations-list {
@@ -132,9 +149,12 @@ if ($other_user_id) {
     
     .conversation-item {
       padding: 12px 16px;
-      border-bottom: 1px solid #e0e0e0;
+      border-bottom: 1px solid #f0f0f0;
       cursor: pointer;
       transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
     
     .conversation-item:hover {
@@ -142,50 +162,105 @@ if ($other_user_id) {
     }
     
     .conversation-item.active {
-      background: #e8f5e9;
-      border-left: 4px solid var(--primary);
+      background: #d9fdd3;
+      border-left: 4px solid #128c7e;
+    }
+    
+    .conversation-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #666;
+      font-size: 18px;
+    }
+    
+    .conversation-info {
+      flex: 1;
+      min-width: 0;
     }
     
     .conversation-name {
       font-weight: 600;
-      color: var(--primary);
+      color: #111;
+      margin-bottom: 4px;
     }
     
     .conversation-preview {
-      font-size: 12px;
+      font-size: 13px;
       color: #666;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .conversation-time {
+      font-size: 11px;
+      color: #999;
+      margin-left: auto;
+      white-space: nowrap;
     }
     
     .conversation-unread {
-      display: inline-block;
-      background: var(--primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #128c7e;
       color: white;
       padding: 2px 8px;
       border-radius: 12px;
       font-size: 11px;
-      margin-left: 8px;
+      font-weight: 700;
+      min-width: 20px;
+      height: 20px;
     }
     
+    /* Chat Panel */
     .chat-panel {
-      background: white;
+      background: #ffffff;
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       display: flex;
       flex-direction: column;
+      position: relative;
     }
     
     .chat-panel-header {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      background: #128c7e;
       color: white;
       padding: 16px;
       font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
     
+    .chat-panel-header .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #4caf50;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.3);
+    }
+    
+    .chat-panel-header .status-text {
+      font-size: 12px;
+      opacity: 0.9;
+      margin-left: auto;
+    }
+    
+    /* Messages Area */
     .chat-messages {
       flex: 1;
       overflow-y: auto;
@@ -193,83 +268,209 @@ if ($other_user_id) {
       display: flex;
       flex-direction: column;
       gap: 12px;
-      background: #f9f9f9;
+      background: #e5ddd5;
+      background-image: 
+        radial-gradient(circle at 25px 25px, #d1c4e9 2px, transparent 0),
+        radial-gradient(circle at 75px 75px, #d1c4e9 2px, transparent 0);
+      background-size: 100px 100px;
+      background-position: 0 0, 50px 50px;
+    }
+    
+    .message-date {
+      text-align: center;
+      font-size: 11px;
+      color: #666;
+      margin: 16px 0;
+      background: rgba(0,0,0,0.1);
+      padding: 4px 8px;
+      border-radius: 12px;
+      display: inline-block;
+      margin-left: auto;
+      margin-right: auto;
     }
     
     .chat-message {
       display: flex;
       gap: 8px;
       align-items: flex-end;
+      max-width: 80%;
     }
     
     .chat-message.sent {
       justify-content: flex-end;
+      margin-left: auto;
+    }
+    
+    .chat-message.received .message-avatar {
+      display: none;
+    }
+    
+    .message-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #666;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    
+    .message-content {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
     
     .chat-message-bubble {
-      max-width: 70%;
-      padding: 12px 16px;
-      border-radius: 12px;
+      padding: 10px 14px;
+      border-radius: 18px;
       word-wrap: break-word;
+      font-size: 14px;
+      line-height: 1.4;
+      position: relative;
+      max-width: 100%;
     }
     
     .chat-message.received .chat-message-bubble {
-      background: white;
-      color: #333;
+      background: #ffffff;
+      color: #111;
       border: 1px solid #e0e0e0;
+      border-radius: 18px 18px 18px 4px;
     }
     
     .chat-message.sent .chat-message-bubble {
-      background: var(--primary);
+      background: #075e54;
       color: white;
+      border-radius: 18px 18px 4px 18px;
     }
     
     .chat-message-time {
       font-size: 11px;
       color: #999;
-      margin-top: 4px;
+      text-align: right;
+      margin-top: 2px;
     }
     
+    .chat-message.received .chat-message-time {
+      color: #999;
+      text-align: left;
+    }
+    
+    /* Input Area */
     .chat-input-area {
       padding: 16px;
       border-top: 1px solid #e0e0e0;
+      background: #f0f2f5;
       display: flex;
       gap: 8px;
+      align-items: flex-end;
+    }
+    
+    .chat-input-area .input-container {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      background: white;
+      border-radius: 24px;
+      padding: 8px 12px;
+      border: 1px solid #e0e0e0;
     }
     
     .chat-input-area textarea {
       flex: 1;
-      padding: 12px;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
+      border: none;
+      outline: none;
       resize: none;
       font-family: inherit;
+      font-size: 14px;
+      line-height: 1.4;
       min-height: 40px;
-      max-height: 80px;
+      max-height: 120px;
+      padding: 4px 8px;
+    }
+    
+    .chat-input-area .input-actions {
+      display: flex;
+      gap: 8px;
     }
     
     .chat-input-area button {
-      padding: 12px 20px;
-      background: var(--primary);
+      padding: 8px 12px;
+      background: #128c7e;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 50%;
       cursor: pointer;
       font-weight: 600;
       transition: background 0.2s;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .chat-input-area button:hover {
-      background: var(--primary-dark);
+      background: #075e54;
     }
     
+    .chat-input-area button.secondary {
+      background: #ddd;
+      color: #666;
+    }
+    
+    .chat-input-area button.secondary:hover {
+      background: #ccc;
+    }
+    
+    /* Empty State */
     .empty-chat {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100%;
       color: #999;
       text-align: center;
+      background: #e5ddd5;
+      background-image: 
+        radial-gradient(circle at 25px 25px, #d1c4e9 2px, transparent 0),
+        radial-gradient(circle at 75px 75px, #d1c4e9 2px, transparent 0);
+      background-size: 100px 100px;
+      background-position: 0 0, 50px 50px;
+    }
+    
+    .empty-chat .icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    
+    /* Scrollbar styling */
+    .conversations-list::-webkit-scrollbar,
+    .chat-messages::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .conversations-list::-webkit-scrollbar-track,
+    .chat-messages::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    
+    .conversations-list::-webkit-scrollbar-thumb,
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+    
+    .conversations-list::-webkit-scrollbar-thumb:hover,
+    .chat-messages::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
     }
   </style>
 </head>
@@ -283,13 +484,18 @@ if ($other_user_id) {
         </div>
         <div style="flex:1"></div>
         <div class="user-actions">
-          <a href="dashboard.php" class="btn" style="background:var(--accent);color:var(--text-dark)">← Kembali</a>
           <a href="logout.php" class="logout">Logout</a>
         </div>
       </div>
     </header>
 
+
     <main class="main">
+
+      <div class="user-actions">
+          <a href="dashboard.php" class="btn" style="background:var(--accent);color:var(--text-dark)">← Kembali</a>
+        </div>
+        
       <h1 style="color:var(--primary);margin-bottom:20px">💬 Pesan & Chat</h1>
       
       <div class="chat-view">
@@ -323,23 +529,51 @@ if ($other_user_id) {
         <!-- Chat Panel -->
         <div class="chat-panel">
           <?php if ($other_user): ?>
-            <div class="chat-panel-header">Chat dengan <?= htmlspecialchars($other_user['username']) ?></div>
+            <div class="chat-panel-header">
+              <div class="conversation-avatar">
+                <?= strtoupper(substr(htmlspecialchars($other_user['username']), 0, 1)) ?>
+              </div>
+              <div>
+                <?= htmlspecialchars($other_user['username']) ?>
+                <div class="status-text">online</div>
+              </div>
+            </div>
             
             <div class="chat-messages">
-              <?php foreach ($messages as $msg): ?>
-                <div class="chat-message <?= $msg['sender_id'] === $user_id ? 'sent' : 'received' ?>">
+              <?php if (!$messages): ?>
+                <div class="message-date">Hari ini</div>
+                <div class="empty-chat">
                   <div>
-                    <div class="chat-message-bubble"><?= htmlspecialchars($msg['message_text']) ?></div>
-                    <div class="chat-message-time"><?= htmlspecialchars(date('H:i', strtotime($msg['created_at']))) ?></div>
+                    <div class="icon">💬</div>
+                    <p style="margin:0;color:#666">Mulai percakapan dengan <?= htmlspecialchars($other_user['username']) ?></p>
                   </div>
                 </div>
-              <?php endforeach; ?>
+              <?php else: ?>
+                <div class="message-date">Hari ini</div>
+                <?php foreach ($messages as $msg): ?>
+                  <div class="chat-message <?= $msg['sender_id'] === $user_id ? 'sent' : 'received' ?>">
+                    <?php if ($msg['sender_id'] !== $user_id): ?>
+                      <div class="message-avatar">
+                        <?= strtoupper(substr(htmlspecialchars($other_user['username']), 0, 1)) ?>
+                      </div>
+                    <?php endif; ?>
+                    <div class="message-content">
+                      <div class="chat-message-bubble"><?= htmlspecialchars($msg['message_text']) ?></div>
+                      <div class="chat-message-time"><?= htmlspecialchars(date('H:i', strtotime($msg['created_at']))) ?></div>
+                    </div>
+                  </div>
+                <?php endforeach; ?>
+              <?php endif; ?>
             </div>
             
             <form method="post" class="chat-input-area">
               <input type="hidden" name="action" value="send_message">
-              <textarea name="message" placeholder="Ketik pesan Anda..." required></textarea>
-              <button type="submit">Kirim</button>
+              <div class="input-container">
+                <button type="button" class="secondary" title="Emoji">😊</button>
+                <textarea name="message" placeholder="Ketik pesan Anda..." required></textarea>
+                <button type="button" class="secondary" title="Attachment">📎</button>
+              </div>
+              <button type="submit" title="Kirim">➤</button>
             </form>
           <?php else: ?>
             <div class="empty-chat">

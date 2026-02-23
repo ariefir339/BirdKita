@@ -135,13 +135,19 @@ foreach ($listings as $l) {
         </div>
         <div style="flex:1"></div>
         <div class="user-actions">
-          <a href="dashboard.php" class="btn" style="background:var(--accent);color:var(--text-dark)">← Kembali</a>
           <a href="logout.php" class="logout">Logout</a>
         </div>
       </div>
     </header>
 
     <main class="main">
+
+<div class="user-actions">
+          <a href="dashboard.php" class="btn" style="background:var(--accent);color:var(--text-dark)">← Kembali</a>
+        </div>
+
+<br>
+
       <?php if ($message): ?>
         <div class="messages" style="margin-bottom:20px">
           <?= htmlspecialchars($message) ?>

@@ -57,6 +57,33 @@ try {
     // tabel mungkin belum ada, biarkan kosong
 }
 
+$birds = [];
+
+$stmt = $pdo->query("
+SELECT *
+FROM winners
+ORDER BY bird_type ASC, created_at DESC
+");
+
+$birds = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$birdsByType = [];
+
+foreach ($birds as $bird) {
+
+    $type = strtolower(trim($bird['bird_type'] ?? 'lainnya'));
+
+    if ($type == '') {
+        $type = 'lainnya';
+    }
+
+    if (!isset($birdsByType[$type])) {
+        $birdsByType[$type] = [];
+    }
+
+    $birdsByType[$type][] = $bird;
+}
+
 // ambil pesanan user
 $orders = [];
 try {
@@ -130,36 +157,53 @@ try {
         <!-- ===== HALAMAN GALERI ===== -->
         <?php if ($page === 'gallery'): ?>
           <div class="row">
-            <h2 class="row-title">🐦 Burung untuk Dijual</h2>
+            <h3>🐦 Galeri Burung</h3>
             
             <?php if (!$birds): ?>
               <div style="text-align:center;padding:40px;color:#999">
                 <p style="font-size:16px;margin:0">Belum ada burung untuk dijual :(</p>
               </div>
             <?php else: ?>
-              <div class="carousel" tabindex="0">
-                <button class="nav left" aria-label="Lihat sebelumnya">‹</button>
-                <div class="list">
-                  <?php foreach ($birds as $bird): ?>
-                    <a href="bird_detail.php?id=<?=$bird['id']?>" class="item" style="cursor:pointer;text-decoration:none;color:inherit">
-                      <?php if (!empty($bird['image_path']) && file_exists($bird['image_path'])): ?>
-                        <img src="<?=htmlspecialchars($bird['image_path'])?>" alt="<?=htmlspecialchars($bird['bird_name'])?>">
-                      <?php else: ?>
-                        <img src="assets/parrot.svg" alt="<?=htmlspecialchars($bird['bird_name'])?>">
-                      <?php endif; ?>
-                      <div class="caption">
-                        <strong><?=htmlspecialchars($bird['bird_name'])?></strong>
-                        <div style="font-size:11px;color:#666;margin:2px 0"><?=htmlspecialchars($bird['bird_type'] ?? '-')?></div>
-                        <div style="font-size:13px;font-weight:bold;color:var(--primary)">Rp <?=number_format(floatval($bird['bird_price'] ?? 0), 0, ',', '.')?></div>
+              <!-- Filter Tabs -->
+              <div class="filter-tabs">
+                <button class="filter-btn active" data-filter="all">Semua</button>
+                <?php foreach ($birdsByType as $type => $birdsOfType): ?>
+                  <button class="filter-btn" data-filter="<?=htmlspecialchars($type)?>">
+                    <?=htmlspecialchars(ucfirst($type))?>
+                  </button>
+                <?php endforeach; ?>
+              </div>
+
+              <!-- Gallery Grid -->
+              <div class="gallery-grid">
+                <?php foreach ($birdsByType as $type => $birdsOfType): ?>
+                  <div class="gallery-section" data-type="<?=htmlspecialchars($type)?>">
+                    <h4><?=htmlspecialchars(ucfirst($type))?></h4>
+                    <div class="carousel" tabindex="0">
+                      <button class="nav left" aria-label="Lihat sebelumnya">‹</button>
+                      <div class="list">
+                        <?php foreach ($birdsOfType as $bird): ?>
+                          <a href="bird_detail.php?id=<?=$bird['id']?>" class="item" style="cursor:pointer;text-decoration:none;color:inherit">
+                            <?php if (!empty($bird['image_path']) && file_exists($bird['image_path'])): ?>
+                              <img src="<?=htmlspecialchars($bird['image_path'])?>" alt="<?=htmlspecialchars($bird['bird_name'])?>">
+                            <?php else: ?>
+                              <img src="assets/parrot.svg" alt="<?=htmlspecialchars($bird['bird_name'])?>">
+                            <?php endif; ?>
+                            <div class="caption">
+                              <strong><?=htmlspecialchars($bird['bird_name'])?></strong>
+                              <div style="font-size:11px;color:#666;margin:2px 0"><?=htmlspecialchars($bird['bird_type'] ?? '-')?></div>
+                              <div style="font-size:13px;font-weight:bold;color:var(--primary)">Rp <?=number_format(floatval($bird['bird_price'] ?? 0), 0, ',', '.')?></div>
+                            </div>
+                          </a>
+                        <?php endforeach; ?>
                       </div>
-                    </a>
-                  <?php endforeach; ?>
-                </div>
-                <button class="nav right" aria-label="Lihat selanjutnya">›</button>
+                      <button class="nav right" aria-label="Lihat selanjutnya">›</button>
+                    </div>
+                  </div>
+                <?php endforeach; ?>
               </div>
             <?php endif; ?>
           </div>
-
         <!-- ===== HALAMAN PESANAN ===== -->
         <?php elseif ($page === 'orders'): ?>
           <div class="row">
@@ -230,10 +274,10 @@ try {
           </div>
 
         <?php endif; ?>
-      <footer class="site-footer">
+
+    </main>      <footer class="site-footer">
         <div class="footer-inner">🐦 BirdKita - Marketplace & Komunitas Burung Indonesia © 2026</div>
       </footer>
-    </main>
   </div>
 
   <script>
@@ -294,6 +338,30 @@ try {
       list.addEventListener('scroll', updateArrows);
       window.addEventListener('resize', updateArrows);
       updateArrows();
+    });
+
+    // Filter functionality
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const gallerySections = document.querySelectorAll('.gallery-section');
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const filter = this.getAttribute('data-filter');
+        
+        // Update active button
+        filterBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+
+        // Show/hide sections
+        gallerySections.forEach(section => {
+          const type = section.getAttribute('data-type');
+          if (filter === 'all' || type === filter) {
+            section.style.display = '';
+          } else {
+            section.style.display = 'none';
+          }
+        });
+      });
     });
 
     // Search filter
